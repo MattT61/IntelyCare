@@ -27,13 +27,7 @@ public class SearchEngineDriver {
         writer = createWriter();
     }
 
-    private static void deleteDocumentsForID(String id) throws Exception {
-        Term term = new Term("id", id);
-        writer.deleteDocuments(term);
-        long results = 0;
-        results = writer.commit();
 
-    }
     private static Document createDocument(String id, String token) throws IOException
     {
         Document document = new Document();
@@ -120,6 +114,22 @@ public class SearchEngineDriver {
 
                 }
 
+                // Validate the tokens
+                if (tokens.length < 3) {
+                    returnStatus.setDocStatus(false);
+                    returnStatus.setErrorString("No tokens to add.");
+
+                }
+
+                for (int idx=2; idx<tokens.length; ++idx ) {
+                    for ( int ch=0; ch<tokens[idx].length(); ++ch ) {
+                        if (!Character.isLetterOrDigit(tokens[idx].charAt(ch))) {
+                            returnStatus.setDocStatus(false);
+                            returnStatus.setErrorString("Invalid characters in token");
+
+                        }
+                    }
+                }
                 // First, delete the existing tokens for this ID
                 if (!deleteTokensForDocumentID(returnStatus.DocumentID())) {
                     returnStatus.setDocStatus(false);
